@@ -14,12 +14,12 @@ $ k get deployments --all-namespaces -o json | jq .items | \
 output:
 
 ```
-| deployment_name                       | namespace          | containers                                  |
-|---------------------------------------+--------------------+---------------------------------------------|
-| akuity-agent                          | akuity             | akuity-agent                                |
-| argocd-application-controller         | akuity             | syncer, argocd-application-controller       |
-| argocd-applicationset-controller      | akuity             | argocd-applicationset-controller            |
-| argocd-image-updater                  | akuity             | argocd-image-updater                        |
+| deployment_name                     | namespace    | containers                                |
+|-------------------------------------+--------------+-------------------------------------------|
+| akuity-agent                        | akuity       | akuity-agent                              |
+| argocd-application-controller       | akuity       | syncer, argocd-application-controller     |
+| argocd-applicationset-controller    | akuity       | argocd-applicationset-controller          |
+| argocd-image-updater                | akuity       | argocd-image-updater                      |
 ```
 
 Here `spec.template.spec.containers` is a list, and when requesting its `name`, `jt.py` puts them into a row separated with a comma.
