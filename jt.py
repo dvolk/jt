@@ -1,5 +1,6 @@
 import sys
 import json
+import yaml
 import argh
 from tabulate import tabulate
 
@@ -30,20 +31,56 @@ def flatten_dict(d, parent_key="", sep="."):
     return items
 
 
+def parse_input(input_data, input_format):
+    """
+    Parses the input data based on the specified input format.
+    Returns a list of dictionaries.
+    """
+    if input_format == "json":
+        data = json.loads(input_data)
+        if not isinstance(data, list):
+            data = [data]
+        return data
+    elif input_format == "yaml":
+        data = yaml.safe_load(input_data)
+        if not isinstance(data, list):
+            data = [data]
+        return data
+    elif input_format == "helm":
+        documents = input_data.split("---")
+        data = []
+        for doc in documents:
+            doc = doc.strip()
+            if doc:
+                obj = yaml.safe_load(doc)
+                if isinstance(obj, dict):
+                    data.append(obj)
+                elif isinstance(obj, list):
+                    data.extend(obj)
+        return data
+    else:
+        raise ValueError(f"Unsupported input format: {input_format}")
+
+
 @argh.arg("--sep", default=".", help="Separator for nested keys")
 @argh.arg(
     "--columns",
     help='Comma-separated list of columns to output. Optionally rename columns using "column_path=new_name"',
 )
 @argh.arg("--tablefmt", default="orgtbl", help="Table format for tabulate")
-def main(sep=".", columns=None, tablefmt="orgtbl"):
+@argh.arg(
+    "--input-format",
+    "-f",
+    default="json",
+    choices=["json", "yaml", "helm"],
+    help="Input format",
+)
+def main(sep=".", columns=None, tablefmt="orgtbl", input_format="json"):
     """
-    Reads a JSON string from stdin and outputs a flattened table.
+    Reads input data from stdin and outputs a flattened table.
     """
     input_data = sys.stdin.read()
-    data = json.loads(input_data)
-    if not isinstance(data, list):
-        data = [data]
+    data = parse_input(input_data, input_format)
     flattened_data = [flatten_dict(d, sep=sep) for d in data]
 
     header_mappings = {}
@@ -69,14 +106,19 @@ def main(sep=".", columns=None, tablefmt="orgtbl"):
 
 
 @argh.arg("--sep", default=".", help="Separator for nested keys")
-def list_columns(sep="."):
+@argh.arg(
+    "--input-format",
+    "-f",
+    default="json",
+    choices=["json", "yaml", "helm"],
+    help="Input format",
+)
+def list_columns(sep=".", input_format="json"):
     """
-    Reads a JSON string from stdin and outputs the list of available columns.
+    Reads input data from stdin and outputs the list of available columns.
     """
     input_data = sys.stdin.read()
-    data = json.loads(input_data)
-    if not isinstance(data, list):
-        data = [data]
+    data = parse_input(input_data, input_format)
     flattened_data = [flatten_dict(d, sep=sep) for d in data]
     columns = sorted({key for item in flattened_data for key in item.keys()})
     for col in columns:
