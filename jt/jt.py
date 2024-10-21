@@ -125,5 +125,9 @@ def list_columns(sep=".", input_format="json"):
         print(col)
 
 
-if __name__ == "__main__":
+def cli():
     argh.dispatch_commands([main, list_columns])
+
+
+if __name__ == "__main__":
+    cli()
