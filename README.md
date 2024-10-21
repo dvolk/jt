@@ -8,7 +8,7 @@ To get a list of kubernetes deployments, their namespace and the containers in t
 
 ```
 $ k get deployments --all-namespaces -o json | jq .items | \
-   env/bin/python jt.py main --columns "metadata.name=deployment_name, metadata.namespace=namespace, spec.template.spec.containers.name=containers"
+   jt main --columns "metadata.name=deployment_name,metadata.namespace=namespace,spec.template.spec.containers.name=containers"
 ```
 
 output:
@@ -30,6 +30,16 @@ Here `spec.template.spec.containers` is a list, and when requesting its `name`, 
 - outputs lists as comma separated values in row
 - column filtering
 - column renaming
+
+## Installation
+
+```
+git clone https://github.com/dvolk/jt
+cd jt
+python3 -m venv env
+./env/bin/pip install .
+echo "alias jt=$(pwd)/env/bin/jt" >> ~/.bashrc
+```
 
 ## Other
 
