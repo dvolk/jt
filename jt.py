@@ -1,3 +1,13 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "tabulate==0.9.0",
+#     "pyyaml==6.0.2",
+#     "argh==0.31.3",
+# ]
+# ///
+
 import sys
 import json
 import yaml
@@ -125,8 +135,11 @@ def list_columns(sep=".", input_format="json"):
         print(col)
 
 
-def cli():
-    argh.dispatch_commands([main, list_columns])
+def cli(argv=None):
+    parser = argh.ArghParser()
+    parser.add_commands([main, list_columns])
+    parser.set_default_command(main)
+    parser.dispatch(argv)
 
 
 if __name__ == "__main__":
